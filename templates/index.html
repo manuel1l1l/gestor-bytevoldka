@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gestor de Bases de Datos - BITEVOLDKA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-content">
+            <!-- Aquí puedes poner tu imagen de logo -->
+            <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo" class="logo">
+            <a href="{{ url_for('index') }}" class="title-link">
+                <span class="title">Gestor de Bases de Datos <br> <span id="marca">BYTEVOLDKA</span></span>
+            </a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Bases de Datos</h2>
+            <div class="db-list">
+                <ul>
+                    {% for db in databases %}
+                        <li>
+                            <a href="{{ url_for('database', db_name=db) }}">{{ db }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+<button class="new-db-btn" onclick="window.location.href='{{ url_for('index') }}'">New Data Base</button>        </div>
+        <div class="main-content">
+            <div class="profile-box">
+                <h2>Crear Nueva Base de Datos</h2>
+                <form action="{{ url_for('create_database') }}" method="post">
+                    <label for="db_name">Nombre de la base de datos:</label>
+                    <input type="text" id="db_name" name="db_name" placeholder="Ejemplo: mi_base" required>
+                    <button type="submit">Crear</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

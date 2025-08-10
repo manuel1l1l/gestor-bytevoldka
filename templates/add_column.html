@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Título de la página con el nombre de la tabla y la base de datos -->
+    <title>Agregar columna a {{ table_name }} - {{ db_name }}</title>
+
+    <!-- Enlace al archivo CSS que está en la carpeta 'static' -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Barra superior con logo y título -->
+    <div class="topbar">
+        <div class="topbar-content">
+            <!-- Enlace al inicio -->
+            <a href="{{ url_for('index') }}" class="title-link">
+            <!-- Logo de la aplicación -->
+            <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo" class="logo">
+                <span class="title">
+                    Gestor de Bases de Datos <br> 
+                    <span id="marca">BYTEVOLDKA</span>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Barra lateral con lista de bases de datos -->
+        <div class="sidebar">
+            <h2>Bases de Datos</h2>
+            <div class="db-list">
+                <ul>
+                    <!-- Bucle que recorre todas las bases de datos y las muestra -->
+                    {% for db in databases %}
+                        <li>
+                            <!-- Enlace a cada base de datos -->
+                            <a href="{{ url_for('database', db_name=db) }}">{{ db }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <!-- Botón para volver a la página principal -->
+            <button class="new-db-btn" onclick="window.location.href='{{ url_for('index') }}'">
+                New Data Base
+            </button>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <div class="profile-box">
+                <!-- Título indicando en qué tabla se añadirá la columna -->
+                <h3>Agregar columna a la tabla "{{ table_name }}"</h3>
+
+                <!-- Mostrar mensajes flash (errores o avisos) -->
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="flash-messages">
+                      {% for msg in messages %}
+                        <div class="flash-error">{{ msg }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+                <!-- Formulario para agregar o modificar una columna -->
+                <form action="{{ url_for('add_column', db_name=db_name, table_name=table_name) }}" method="post">
+                    
+                    <!-- Nombre de la columna -->
+                    <label for="col_name">Nombre de la columna:</label>
+                    <input type="text" id="col_name" name="col_name" 
+                           value="{{ columna.Field if columna else request.args.get('col_name', '') }}" 
+                           required 
+                           {% if columna %}readonly{% endif %}>
+
+                    <!-- Tipo de la columna -->
+                    <label for="col_type" style="margin-left:10px;">Tipo:</label>
+                    <select id="col_type" name="col_type">
+                        <option value="INT" {% if columna and 'int' in columna.Type %}selected{% endif %}>INT</option>
+                        <option value="VARCHAR" {% if columna and 'varchar' in columna.Type %}selected{% endif %}>VARCHAR</option>
+                        <option value="FLOAT" {% if columna and 'float' in columna.Type %}selected{% endif %}>FLOAT</option>
+                    </select>
+
+                    <!-- Checkbox para 'Unique' -->
+                    <label style="margin-left:10px;">
+                        <input type="checkbox" name="col_unique" 
+                               {% if columna and columna.Key == 'UNI' %}checked{% endif %}> Unique
+                    </label>
+
+                    <!-- Checkbox para permitir NULL -->
+                    <label style="margin-left:10px;">
+                        <input type="checkbox" name="col_null" 
+                               {% if not columna or columna.Null == 'YES' %}checked{% endif %}> Null
+                    </label>
+
+                    <!-- Checkbox para clave primaria -->
+                    <label style="margin-left: 10px;">
+                        <input type="checkbox" name="col_primary" 
+                               {% if columna and columna.Key == 'PRI' %}checked{% endif %}> Primary Key
+                    </label>
+
+                    <!-- Botón para guardar -->
+                    <button type="submit" style="margin-top:16px;">
+                        {% if columna %}Guardar cambios{% else %}Agregar columna{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
