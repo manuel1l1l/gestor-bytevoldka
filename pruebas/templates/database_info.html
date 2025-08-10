@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Información de la base de datos: {{ db_name }} - BYTEVOLDKA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-content">
+            <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo" class="logo">
+            <a href="{{ url_for('index') }}" class="title-link">
+                <span class="title">Gestor de Bases de Datos <br> <span id="marca">BYTEVOLDKA</span></span>
+            </a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Bases de Datos</h2>
+            <div class="db-list">
+                <ul>
+                    {% for db in databases %}
+                        <li>
+                            <a href="{{ url_for('database', db_name=db) }}">{{ db }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <button class="new-db-btn" onclick="window.location.href='{{ url_for('index') }}'">New Data Base</button>
+        </div>
+        <div class="main-content" style="width:80%;">
+            <div class="profile-box">
+                <h3>Información de la base de datos "{{ db_name }}"</h3>
+                <form method="post" action="{{ url_for('eliminar_base', db_name=db_name) }}" style="margin-top:20px;">
+                    <button class="tabla-btn eliminar" type="submit" onclick="return confirm('¿Seguro que deseas eliminar la base de datos {{ db_name }}? Esta acción es irreversible.');">
+                        Eliminar base de datos
+                    </button>
+               
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

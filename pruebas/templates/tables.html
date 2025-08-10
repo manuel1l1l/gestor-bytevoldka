@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tablas de {{ db_name }} - BYTEVOLDKA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-content">
+            <!-- Aquí puedes poner tu imagen de logo -->
+            <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo" class="logo">
+            <a href="{{ url_for('index') }}" class="title-link">
+                <span class="title">Gestor de Bases de Datos <br> <span id="marca">BYTEVOLDKA</span></span>
+            </a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Bases de Datos</h2>
+            <div class="db-list">
+                <ul>
+                    {% for db in databases %}
+                        <li>
+                            <a href="{{ url_for('database', db_name=db) }}">{{ db }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <button class="new-db-btn" onclick="window.location.href='{{ url_for('index') }}'">New Data Base</button>
+        </div>
+  
+        <div class="main-content">
+            <h2>Tablas y registros en {{ db_name }}</h2>
+            {% if tablas_con_registros %}
+                {% for tabla in tablas_con_registros %}
+                    <div class="profile-box tabla-box">
+                        <h3>{{ tabla.nombre }}</h3>
+                        {% if tabla.registros %}
+                            <table class="tabla-registros">
+                                <tr>
+                                    {% for col in tabla.columnas %}
+                                        {% if col == tabla.pk %}
+                                            <th style="background:#dc3545; color:#fff;" title="Primary Key">{{ col }} (PK)</th>
+                                        {% else %}
+                                            <th>{{ col }}</th>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% for fila in tabla.registros %}
+                                    <tr>
+                                        {% for col in tabla.columnas %}
+                                            <td>{{ fila[col] }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% else %}
+                            <p>No hay registros en esta tabla.</p>
+                        {% endif %}
+
+                
+                      
+
+                        <!-- Formulario para modificar columna con formato tipo registro -->
+                         <div>
+    <form method="get" action="{{ url_for('redirigir_modificar_columna', db_name=db_name, table_name=tabla.nombre) }}">
+        <label for="col_mod_{{ tabla.nombre }}">Nombre columna</label>
+        <input type="text" id="col_mod_{{ tabla.nombre }}" name="col_name" placeholder="Nombre columna" required>
+        <button class="tabla-btn" type="submit" name="accion" value="modificar">Modificar</button>
+        <button class="tabla-btn eliminar" type="submit" name="accion" value="eliminar">Eliminar</button>
+        <button class="registro-btn crear"
+            onclick="window.location.href='{{ url_for('add_column', db_name=db_name, table_name=tabla.nombre) }}'"
+            type="button">
+            Agregar columna
+        </button>
+    </form>
+</div>
+
+                        <!-- Botones de registro (debajo de los de tabla) -->
+                        <div class="registro-actions" style="position:static; margin-top:10px;">
+                            <form class="registro-form" style="display:inline-block;" method="post" action="{{ url_for('accion_registro', db_name=db_name, table_name=tabla.nombre) }}">
+                                <label for="pk_{{ tabla.nombre }}">PK:</label>
+                                <input type="text" id="pk_{{ tabla.nombre }}" name="pk_value" placeholder="Primary Key" required>
+                                <button class="registro-btn eliminar" type="submit" name="accion" value="eliminar">Eliminar registro</button>
+                                <button class="tabla-btn" type="submit" name="accion" value="modificar">Modificar registro</button>
+                            <button class="registro-btn crear"
+                                onclick="window.location.href='{{ url_for('create_registro', db_name=db_name, table_name=tabla.nombre) }}'"
+                                type="button">
+                                Crear registro
+                            </button>
+                            </form>
+                            
+                        </div>
+                        <!-- Acciones de columnas -->
+
+
+<!-- Acciones de registros -->
+
+
+<!-- Acción eliminar tabla -->
+<div class="acciones-box">
+    <strong>Tabla:</strong>
+    <form method="post" action="{{ url_for('eliminar_tabla', db_name=db_name, table_name=tabla.nombre) }}" style="display:inline;">
+        <button class="tabla-btn eliminar" type="submit" onclick="return confirm('¿Seguro que deseas eliminar la tabla {{ tabla.nombre }}?');">
+            Eliminar tabla
+        </button>
+    </form>
+</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No hay tablas en esta base de datos.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

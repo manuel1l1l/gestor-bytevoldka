@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Título de la pestaña con el nombre de la tabla y base de datos -->
+    <title>Crear registro en {{ table_name }} - {{ db_name }}</title>
+
+    <!-- Enlace a la hoja de estilos CSS almacenada en la carpeta 'static' -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- Barra superior con logo y título -->
+    <div class="topbar">
+        <div class="topbar-content">
+            <!-- Enlace al inicio con el título -->
+            <a href="{{ url_for('index') }}" class="title-link">
+            <!-- Logo de la aplicación -->
+            <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo" class="logo">
+                <span class="title">
+                    Gestor de Bases de Datos <br> 
+                    <span id="marca">BYTEVOLDKA</span>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Barra lateral con lista de bases de datos -->
+        <div class="sidebar">
+            <h2>Bases de Datos</h2>
+            <div class="db-list">
+                <ul>
+                    <!-- Bucle que recorre todas las bases de datos disponibles -->
+                    {% for db in databases %}
+                        <li>
+                            <!-- Enlace para acceder a cada base de datos -->
+                            <a href="{{ url_for('database', db_name=db) }}">{{ db }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <!-- Botón para volver a la página principal y crear una nueva base de datos -->
+            <button class="new-db-btn" onclick="window.location.href='{{ url_for('index') }}'">
+                New Data Base
+            </button>
+        </div>
+
+        <div class="container">
+            <div class="main-content">
+                <div class="profile-box">
+                    <!-- Título indicando en qué tabla se creará el registro -->
+                    <h3>Crear registro en la tabla "{{ table_name }}"</h3>
+
+                    <!-- Formulario para crear o actualizar un registro -->
+                    <form method="post">
+                        <!-- Recorre todas las columnas de la tabla -->
+                        {% for col in columnas %}
+                            <div style="margin-bottom:10px;">
+                                <!-- Etiqueta con el nombre de la columna -->
+                                <label>{{ col.Field }}:</label>
+
+                                <!-- Campo numérico si el tipo es entero -->
+                                {% if "int" in col.Type %}
+                                    <input type="number" name="{{ col.Field }}" step="1"
+                                        value="{{ registro[col.Field] if registro else '' }}"
+                                        {% if not col.Null or col.Null == 'NO' %}required{% endif %}>
+
+                                <!-- Campo numérico decimal si el tipo es float, double o decimal -->
+                                {% elif "float" in col.Type or "double" in col.Type or "decimal" in col.Type %}
+                                    <input type="number" name="{{ col.Field }}" step="any"
+                                        value="{{ registro[col.Field] if registro else '' }}"
+                                        {% if not col.Null or col.Null == 'NO' %}required{% endif %}>
+
+                                <!-- Campo de texto para cualquier otro tipo de dato -->
+                                {% else %}
+                                    <input type="text" name="{{ col.Field }}" maxlength="255"
+                                        value="{{ registro[col.Field] if registro else '' }}"
+                                        {% if not col.Null or col.Null == 'NO' %}required{% endif %}>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+
+                        <!-- Botón para guardar o actualizar el registro -->
+                        <button type="submit">
+                            {% if registro %}Actualizar{% else %}Guardar{% endif %} registro
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

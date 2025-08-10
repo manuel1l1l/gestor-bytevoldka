@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crear Tabla en {{ db_name }} - BYTEVOLDKA</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-content">
+            <img src="{{ url_for('static', filename='logo2.png') }}" alt="Logo" class="logo">
+            <a href="{{ url_for('index') }}" class="title-link">
+                <span class="title">Gestor de Bases de Datos <br> <span id="marca">BYTEVOLDKA</span></span>
+            </a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Bases de Datos</h2>
+            <div class="db-list">
+                <ul>
+                    {% for db in databases %}
+                        <li>
+                            <a href="{{ url_for('database', db_name=db) }}">{{ db }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <button class="new-db-btn" onclick="window.location.href='{{ url_for('index') }}'">New Data Base</button>
+        </div>
+        <div class="main-content">
+            <div class="profile-box">
+                <h3>Crear nueva tabla en {{ db_name }}</h3>
+                {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="flash-messages">
+                      {% for msg in messages %}
+                        <div class="flash-error">{{ msg }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+                <form action="{{ url_for('create_table', db_name=db_name) }}" method="post" id="create-table-form">
+                    <label for="table_name">Nombre de la tabla:</label>
+                    <input type="text" id="table_name" name="table_name" value="{{ default_table_name }}" required>
+                    <label for="num_columns" style="margin-left:10px;">Número de columnas:</label>
+                    <input type="number" id="num_columns" name="num_columns" min="1" max="20" value="{{ num_columns }}" required>
+                    <div id="columns-container">
+                        {% for i in range(num_columns) %}
+                        <div style="margin-bottom:10px;">
+                            <label>Columna {{ i+1 }}:</label>
+                            <input type="text" name="col_name_{{ i }}" value="{{ default_columns[i].name }}" required>
+                            <select name="col_type_{{ i }}">
+                                <option value="INT" {% if default_columns[i].type == "INT" %}selected{% endif %}>INT</option>
+                                <option value="VARCHAR" {% if default_columns[i].type == "VARCHAR" %}selected{% endif %}>VARCHAR</option>
+                                <option value="FLOAT" {% if default_columns[i].type == "FLOAT" %}selected{% endif %}>FLOAT</option>
+                            </select>
+                            <label>
+                                <input type="checkbox" name="col_unique_{{ i }}" {% if default_columns[i].unique %}checked{% endif %}> Unique
+                            </label>
+                            <label>
+                                <input type="checkbox" name="col_pk_{{ i }}" {% if default_columns[i].pk %}checked{% endif %}> Primary Key
+                            </label>
+                            <label>
+                                <input type="checkbox" name="col_null_{{ i }}" {% if default_columns[i].null %}checked{% endif %}> Null
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" style="margin-top:16px;">Crear Tabla</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
